@@ -4,6 +4,7 @@ team: dagpenger
 replicas:
   min: 2
   max: 4
+port: 8083
 resources:
   limits:
     cpu: 1000m

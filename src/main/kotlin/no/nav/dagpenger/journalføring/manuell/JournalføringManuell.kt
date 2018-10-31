@@ -8,6 +8,7 @@ import no.nav.dagpenger.streams.Topics.INNGÅENDE_JOURNALPOST
 import no.nav.dagpenger.streams.consumeTopic
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
+import java.time.LocalDate
 
 private val LOGGER = KotlinLogging.logger {}
 
@@ -18,6 +19,7 @@ fun getEnvVar(varName: String, defaultValue: String? = null) =
 
 class JournalføringManuell(private val gsakHttpClient: GsakHttpClient) : Service() {
     override val SERVICE_APP_ID = "journalføring-manuell"
+    override val HTTP_PORT: Int = 8083
 
     companion object {
         @JvmStatic
@@ -44,8 +46,8 @@ class JournalføringManuell(private val gsakHttpClient: GsakHttpClient) : Servic
 
     fun createManuellJournalføringsoppgave(behov: Behov) {
         val response = gsakHttpClient.createManuellJournalføringsoppgave(ManuellJournalføringsoppgaveRequest(
-                aktivDato = "",
-                fristFerdigstillelse = "",
+                aktivDato = LocalDate.now().toString(),
+                fristFerdigstillelse = LocalDate.now().toString(),
                 prioritet = Prioritet.NORM))
 
         LOGGER.info("Created manuell journalføringsoppgave with id ${response.id}")

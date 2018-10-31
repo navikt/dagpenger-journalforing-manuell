@@ -43,7 +43,7 @@ data class ManuellJournalføringsoppgaveRequest(
     val aktivDato: String,
     val fristFerdigstillelse: String,
     val prioritet: Prioritet,
-    val metadata: Metadata? = null
+    val metadata: Map<String, String>? = null
 )
 
 data class ManuellJournalføringsoppgaveResponse(
@@ -77,11 +77,7 @@ data class ManuellJournalføringsoppgaveResponse(
     val endretTidspunkt: String?,
     val prioritet: Prioritet,
     val status: String,
-    val metadata: Metadata?
-)
-
-data class Metadata(
-    val additionalProp: String
+    val metadata: Map<String, String>? = null
 )
 
 enum class Prioritet {
