@@ -37,6 +37,7 @@ class JournalføringManuell(private val gsakHttpClient: GsakHttpClient) : Servic
 
         inngåendeJournalposter
                 .peek { key, value -> LOGGER.info("Processing ${value.javaClass} with key $key") }
+                .filter { _, behov -> behov.getJournalpost().getBehandleneEnhet() != null}
                 .filter { _, behov -> behov.getJournalpost().getJournalpostType() == JournalpostType.MANUELL ||
                         behov.getJournalpost().getJournalpostType() == JournalpostType.UKJENT }
                 .foreach { _, value -> createManuellJournalføringsoppgave(value) }
