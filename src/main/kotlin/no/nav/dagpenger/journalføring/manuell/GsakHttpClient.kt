@@ -4,15 +4,18 @@ import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
+import no.nav.dagpenger.oidc.OidcClient
 
-class GsakHttpClient(private val gsakUrl: String) {
+class GsakHttpClient(private val gsakUrl: String, private val oidcClient: OidcClient) {
 
     fun createManuellJournalføringsoppgave(request: ManuellJournalføringsoppgaveRequest): ManuellJournalføringsoppgaveResponse {
         val url = "${gsakUrl}v1/oppgaver"
         val json = Gson().toJson(request).toString()
         val (_, response, result) = with(url.httpPost().body(json)) {
+            header("Authorization" to oidcClient.oidcToken().access_token.toBearerToken())
             responseObject<ManuellJournalføringsoppgaveResponse>()
         }
+
         return when (result) {
             is Result.Failure -> throw ManuellException(
                     response.statusCode, response.responseMessage, result.getException())
@@ -20,6 +23,8 @@ class GsakHttpClient(private val gsakUrl: String) {
         }
     }
 }
+
+fun String.toBearerToken() = "Bearer $this"
 
 data class ManuellJournalføringsoppgaveRequest(
     val tildeltEnhetsnr: String? = null,

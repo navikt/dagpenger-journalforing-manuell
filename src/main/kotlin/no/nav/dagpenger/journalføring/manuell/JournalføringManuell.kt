@@ -3,28 +3,28 @@ package no.nav.dagpenger.journalføring.manuell
 import mu.KotlinLogging
 import no.nav.dagpenger.events.avro.Behov
 import no.nav.dagpenger.events.avro.JournalpostType
+import no.nav.dagpenger.oidc.StsOidcClient
+import no.nav.dagpenger.streams.KafkaCredential
 import no.nav.dagpenger.streams.Service
 import no.nav.dagpenger.streams.Topics.INNGÅENDE_JOURNALPOST
 import no.nav.dagpenger.streams.consumeTopic
+import no.nav.dagpenger.streams.streamConfig
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import java.time.LocalDate
+import java.util.Properties
 
 private val LOGGER = KotlinLogging.logger {}
 
-private val gsakUrl = getEnvVar("GSAK_OPPGAVER_URL")
-
-fun getEnvVar(varName: String, defaultValue: String? = null) =
-        System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")
-
-class JournalføringManuell(private val gsakHttpClient: GsakHttpClient) : Service() {
-    override val SERVICE_APP_ID = "journalføring-manuell"
-    override val HTTP_PORT: Int = 8083
+class JournalføringManuell(val env: Environment, private val gsakHttpClient: GsakHttpClient) : Service() {
+    override val SERVICE_APP_ID = "journalføring-manuell" // NB: also used as group.id for the consumer group - do not change!
 
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val service = JournalføringManuell(GsakHttpClient(gsakUrl))
+            val env = Environment()
+            val service = JournalføringManuell(
+                    env, GsakHttpClient(env.gsakUrl, StsOidcClient(env.oicdStsUrl, env.username, env.password)))
             service.start()
         }
     }
@@ -37,12 +37,16 @@ class JournalføringManuell(private val gsakHttpClient: GsakHttpClient) : Servic
 
         inngåendeJournalposter
                 .peek { key, value -> LOGGER.info("Processing ${value.javaClass} with key $key") }
-                .filter { _, behov -> behov.getJournalpost().getBehandleneEnhet() != null}
+                .filter { _, behov -> behov.getJournalpost().getBehandleneEnhet() != null }
                 .filter { _, behov -> behov.getJournalpost().getJournalpostType() == JournalpostType.MANUELL ||
                         behov.getJournalpost().getJournalpostType() == JournalpostType.UKJENT }
                 .foreach { _, value -> createManuellJournalføringsoppgave(value) }
 
         return KafkaStreams(builder.build(), this.getConfig())
+    }
+
+    override fun getConfig(): Properties {
+        return streamConfig(appId = SERVICE_APP_ID, bootStapServerUrl = env.bootstrapServersUrl, credential = KafkaCredential(env.username, env.password))
     }
 
     fun createManuellJournalføringsoppgave(behov: Behov) {

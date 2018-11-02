@@ -1,7 +1,7 @@
 pipeline {
   agent any
   environment {
-    APPLICATION_NAME = 'dagpenger-journalfoering-manuell'
+    APPLICATION_NAME = 'dagpenger-journalforing-manuell'
     ZONE = 'fss'
     NAMESPACE = 'default'
     VERSION = sh(script: './gradlew -q printVersion', returnStdout: true).trim()
@@ -70,7 +70,7 @@ pipeline {
     stage('Deploy to non-production') {
       steps {
         script {
-          response = naisDeploy.createNaisAutodeployment(env.APPLICATION_NAME, env.VERSION,"t8",env.ZONE ,env.NAMESPACE, "")
+          response = naisDeploy.createNaisAutodeployment(env.APPLICATION_NAME, env.VERSION,"q1",env.ZONE ,env.NAMESPACE, "")
         }
       }
     }

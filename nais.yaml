@@ -14,3 +14,13 @@ resources:
     memory: 256Mi
 prometheus:
   enabled: true
+fasitResources:
+  used:
+  - alias: dagpenger-journalforing-manuell-properties
+    resourceType: applicationproperties
+  - alias: srvdagpenger-journalforing-manuell
+    resourceType: credential
+  - alias:  kafka-schema-registry
+    resourceType: baseUrl
+  - alias: oppgave.oppgaver
+    resourceType: restservice
