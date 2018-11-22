@@ -1,7 +1,7 @@
 package no.nav.dagpenger.journalføring.manuell
 
 data class Environment(
-    val gsakUrl: String = getEnvVar("OPPGAVE_OPPGAVER_URL"),
+    val gsakOppgaveUrl: String = getEnvVar("OPPGAVE_OPPGAVER_URL"),
     val username: String = getEnvVar("SRVDAGPENGER_JOURNALFORING_MANUELL_USERNAME"),
     val password: String = getEnvVar("SRVDAGPENGER_JOURNALFORING_MANUELL_PASSWORD"),
     val oicdStsUrl: String = getEnvVar("OIDC_STS_ISSUERURL"),
