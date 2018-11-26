@@ -5,10 +5,13 @@ import mu.KotlinLogging
 import no.nav.common.JAASCredential
 import no.nav.common.KafkaEnvironment
 import no.nav.common.embeddedutils.getAvailablePort
+import no.nav.dagpenger.events.avro.Annet
 import no.nav.dagpenger.events.avro.Behov
+import no.nav.dagpenger.events.avro.Ettersending
+import no.nav.dagpenger.events.avro.HenvendelsesType
 import no.nav.dagpenger.events.avro.Journalpost
-import no.nav.dagpenger.events.avro.JournalpostType
-import no.nav.dagpenger.events.avro.Søker
+import no.nav.dagpenger.events.avro.Mottaker
+import no.nav.dagpenger.events.avro.Søknad
 import no.nav.dagpenger.streams.Topics
 import no.nav.dagpenger.streams.Topics.INNGÅENDE_JOURNALPOST
 import org.apache.kafka.clients.CommonClientConfigs
@@ -60,22 +63,21 @@ class JournalføringRutingComponentTest {
     @Test
     fun ` Component test of JournalføringManuell `() {
 
-        //Test data: (hasBehandlendeEnhet, journalpostType)
-        val innkommendeBehov = listOf(
-                Pair(true, JournalpostType.NY),
-                Pair(true, JournalpostType.MANUELL),
-                Pair(true, JournalpostType.GJENOPPTAK),
-                Pair(true, JournalpostType.GJENOPPTAK),
-                Pair(true, JournalpostType.NY),
-                Pair(true, JournalpostType.MANUELL),
-                Pair(true, JournalpostType.UKJENT),
-                Pair(true, JournalpostType.UKJENT),
-                Pair(false, JournalpostType.MANUELL),
-                Pair(true, JournalpostType.ETTERSENDING)
+        //Test data: (hasBehandlendeEnhet, henvendelsesType)
+        val testData = listOf(
+                Pair(true, HenvendelsesType(Søknad.newBuilder().setVedtakstype("NY").build(), null, null)),
+                Pair(true, HenvendelsesType(null, null, Annet())),
+                Pair(true, HenvendelsesType(Søknad.newBuilder().setVedtakstype("GJENOPPTAK").build(), null, null)),
+                Pair(true, HenvendelsesType(Søknad.newBuilder().setVedtakstype("GJENNOPPTAK").build(), null, null)),
+                Pair(true, HenvendelsesType(Søknad.newBuilder().setVedtakstype("NY").build(), null, null)),
+                Pair(true, HenvendelsesType(null, null, Annet())),
+                Pair(true, HenvendelsesType(null, null, Annet())),
+                Pair(true, HenvendelsesType(null, null, Annet())),
+                Pair(false, HenvendelsesType(null, null, Annet())),
+                Pair(true, HenvendelsesType(null, Ettersending(), null))
         )
 
-        val allowedJournalpostTyper = listOf(JournalpostType.MANUELL, JournalpostType.UKJENT)
-        val behovsToProcess = innkommendeBehov.filter { it.first && it.second in allowedJournalpostTyper }.size
+        val behovsToProcess = testData.filter { it.first && it.second.getAnnet() != null }.size
 
         // given an environment
         val env = Environment(
@@ -97,20 +99,20 @@ class JournalføringRutingComponentTest {
 
         manuell.start()
 
-        innkommendeBehov.forEach { testdata ->
-            val innkommendeBehov: Behov = Behov
-                .newBuilder()
+        testData.forEach { data ->
+            val innkommendeBehov = Behov.newBuilder()
                 .setBehovId("123")
+                .setMottaker(Mottaker("12345678912"))
+                .setBehandleneEnhet(if (data.first) "behandleneEnhet" else null)
+                .setHenvendelsesType(data.second)
                 .setJournalpost(
-                    Journalpost
-                        .newBuilder()
-                        .setJournalpostId("12345")
-                        .setSøker(Søker("12345678912"))
-                        .setJournalpostType(testdata.second)
-                        .setBehandleneEnhet(if (testdata.first) "behandlendeEnhet" else null)
-                        .build()
+                        Journalpost
+                                .newBuilder()
+                                .setJournalpostId("12345")
+                                .build()
                 )
                 .build()
+
             val record = behovProducer.send(ProducerRecord(INNGÅENDE_JOURNALPOST.name, innkommendeBehov)).get()
             LOGGER.info { "Produced -> ${record.topic()}  to offset ${record.offset()}" }
         }

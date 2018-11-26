@@ -2,6 +2,8 @@ package no.nav.dagpenger.journalføring.manuell
 
 import mu.KotlinLogging
 import no.nav.dagpenger.events.avro.Behov
+import no.nav.dagpenger.events.hasBehandlendeEnhet
+import no.nav.dagpenger.events.isAnnet
 import no.nav.dagpenger.oidc.StsOidcClient
 import no.nav.dagpenger.streams.KafkaCredential
 import no.nav.dagpenger.streams.Service
@@ -38,9 +40,7 @@ class JournalføringManuell(val env: Environment, private val gsakClient: GsakCl
 
         inngåendeJournalposter
                 .peek { key, value -> LOGGER.info("Processing ${value.javaClass} with key $key") }
-                .filter { _, behov -> behov.getJournalpost().getBehandleneEnhet() != null }
-                .filter { _, behov -> behov.getJournalpost().getJournalpostType() == JournalpostType.MANUELL ||
-                        behov.getJournalpost().getJournalpostType() == JournalpostType.UKJENT }
+                .filter { _, behov -> shouldBeProcessed(behov) }
                 .foreach { _, value -> createManuellJournalføringsoppgave(value) }
 
         return KafkaStreams(builder.build(), this.getConfig())
@@ -61,3 +61,6 @@ class JournalføringManuell(val env: Environment, private val gsakClient: GsakCl
         LOGGER.info("Created manuell journalføringsoppgave with id ${response.id}")
     }
 }
+
+fun shouldBeProcessed(behov: Behov): Boolean =
+        behov.getTrengerManuellBehandling() || (behov.isAnnet() && behov.hasBehandlendeEnhet())
