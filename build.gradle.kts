@@ -20,8 +20,8 @@ apply {
 }
 
 repositories {
-    maven("https://repo.adeo.no/repository/maven-snapshots/")
-    maven("https://repo.adeo.no/repository/maven-central")
+    jcenter()
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("http://packages.confluent.io/maven/")
     maven("https://dl.bintray.com/kotlin/ktor/")
     maven("https://dl.bintray.com/kotlin/kotlinx")
@@ -57,7 +57,7 @@ val ktorVersion = "1.0.0"
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("no.nav.dagpenger:streams:0.2.0-SNAPSHOT")
+    implementation("no.nav.dagpenger:streams:0.2.2-SNAPSHOT")
     implementation("no.nav.dagpenger:events:0.1.6-SNAPSHOT")
 
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
