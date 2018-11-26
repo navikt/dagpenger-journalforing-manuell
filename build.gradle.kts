@@ -8,12 +8,6 @@ plugins {
     id("info.solidsoft.pitest") version "1.3.0"
 }
 
-buildscript {
-    repositories {
-        maven("https://repo.adeo.no/repository/maven-central")
-    }
-}
-
 apply {
     plugin("com.diffplug.gradle.spotless")
     plugin("info.solidsoft.pitest")
@@ -21,6 +15,7 @@ apply {
 
 repositories {
     jcenter()
+    mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("http://packages.confluent.io/maven/")
     maven("https://dl.bintray.com/kotlin/ktor/")
