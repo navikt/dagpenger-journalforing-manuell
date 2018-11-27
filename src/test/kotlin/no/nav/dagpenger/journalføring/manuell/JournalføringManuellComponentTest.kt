@@ -65,16 +65,16 @@ class JournalføringRutingComponentTest {
 
         //Test data: (hasBehandlendeEnhet, henvendelsesType)
         val testData = listOf(
-                Pair(true, HenvendelsesType(Søknad.newBuilder().setVedtakstype("NY").build(), null, null)),
-                Pair(true, HenvendelsesType(null, null, Annet())),
-                Pair(true, HenvendelsesType(Søknad.newBuilder().setVedtakstype("GJENOPPTAK").build(), null, null)),
-                Pair(true, HenvendelsesType(Søknad.newBuilder().setVedtakstype("GJENNOPPTAK").build(), null, null)),
-                Pair(true, HenvendelsesType(Søknad.newBuilder().setVedtakstype("NY").build(), null, null)),
-                Pair(true, HenvendelsesType(null, null, Annet())),
-                Pair(true, HenvendelsesType(null, null, Annet())),
-                Pair(true, HenvendelsesType(null, null, Annet())),
-                Pair(false, HenvendelsesType(null, null, Annet())),
-                Pair(true, HenvendelsesType(null, Ettersending(), null))
+                Pair(true, HenvendelsesType.newBuilder().setSøknad(Søknad()).build()),
+                Pair(true, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
+                Pair(true, HenvendelsesType.newBuilder().setSøknad(Søknad()).build()),
+                Pair(true, HenvendelsesType.newBuilder().setSøknad(Søknad()).build()),
+                Pair(true, HenvendelsesType.newBuilder().setSøknad(Søknad()).build()),
+                Pair(true, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
+                Pair(true, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
+                Pair(true, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
+                Pair(false, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
+                Pair(true, HenvendelsesType.newBuilder().setEttersending(Ettersending()).build())
         )
 
         val behovsToProcess = testData.filter { it.first && it.second.getAnnet() != null }.size
