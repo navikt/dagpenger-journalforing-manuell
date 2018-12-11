@@ -10,6 +10,7 @@ import no.nav.dagpenger.streams.Service
 import no.nav.dagpenger.streams.Topics.INNGÅENDE_JOURNALPOST
 import no.nav.dagpenger.streams.consumeTopic
 import no.nav.dagpenger.streams.streamConfig
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import java.time.LocalDate
@@ -47,7 +48,9 @@ class JournalføringManuell(val env: Environment, private val gsakClient: GsakCl
     }
 
     override fun getConfig(): Properties {
-        return streamConfig(appId = SERVICE_APP_ID, bootStapServerUrl = env.bootstrapServersUrl, credential = KafkaCredential(env.username, env.password))
+        val props = streamConfig(appId = SERVICE_APP_ID, bootStapServerUrl = env.bootstrapServersUrl, credential = KafkaCredential(env.username, env.password))
+        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
+        return props
     }
 
     fun createManuellJournalføringsoppgave(behov: Behov) {

@@ -24,8 +24,10 @@ import org.junit.BeforeClass
 import org.junit.Test
 import java.lang.Thread.sleep
 import java.util.Properties
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 
+@Ignore
 class JournalføringRutingComponentTest {
 
     private val LOGGER = KotlinLogging.logger {}
