@@ -33,7 +33,7 @@ class GsakHttpClientTest {
                 prioritet = Prioritet.NORM)
 
         stubFor(
-            WireMock.post(WireMock.urlEqualTo("/v1/oppgaver"))
+            WireMock.post(WireMock.urlEqualTo("/oppgaver"))
                 .withRequestBody(equalToJson(Gson().toJson(request).toString()))
                 .willReturn(
                     WireMock.aResponse()
@@ -81,7 +81,7 @@ class GsakHttpClientTest {
         )
 
         val response =
-                GsakHttpClient(wireMockRule.url(""), DummyOidcClient()).createManuellJournalføringsoppgave(
+                GsakHttpClient(wireMockRule.url("/oppgaver"), DummyOidcClient()).createManuellJournalføringsoppgave(
                         request, "123")
 
         assertEquals(12345, response.id)
@@ -96,7 +96,7 @@ class GsakHttpClientTest {
                 prioritet = Prioritet.NORM)
 
         stubFor(
-            WireMock.post(WireMock.urlEqualTo("/v1/oppgaver"))
+            WireMock.post(WireMock.urlEqualTo("/oppgaver"))
                 .withRequestBody(equalToJson(Gson().toJson(request).toString()))
                 .willReturn(
                     WireMock.serverError()
@@ -104,7 +104,7 @@ class GsakHttpClientTest {
         )
 
         val response =
-                GsakHttpClient(wireMockRule.url(""), DummyOidcClient()).createManuellJournalføringsoppgave(
+                GsakHttpClient(wireMockRule.url("/oppgaver"), DummyOidcClient()).createManuellJournalføringsoppgave(
                         request, "456")
     }
 }
