@@ -14,6 +14,7 @@ class GsakHttpClient(private val gsakUrl: String, private val oidcClient: OidcCl
     ): ManuellJournalføringsoppgaveResponse {
         val json = Gson().toJson(request).toString()
         val (_, response, result) = with(gsakUrl.httpPost().body(json)) {
+            header(mapOf("Content-Type" to "application/json"))
             header("Authorization" to oidcClient.oidcToken().access_token.toBearerToken())
             header("X-Correlation-ID" to correlationId)
             responseObject<ManuellJournalføringsoppgaveResponse>()
