@@ -40,7 +40,7 @@ class JournalføringManuell(val env: Environment, private val gsakClient: GsakCl
         val inngåendeJournalposter = builder.consumeTopic(INNGÅENDE_JOURNALPOST, env.schemaRegistryUrl)
 
         inngåendeJournalposter
-                .peek { key, value -> LOGGER.info("Processing ${value.javaClass} with key $key") }
+                .peek { key, value -> LOGGER.info("Processing behov with id ${value.getBehovId()}") }
                 .filter { _, behov -> shouldBeProcessed(behov) }
                 .foreach { _, value -> createManuellJournalføringsoppgave(value) }
 
