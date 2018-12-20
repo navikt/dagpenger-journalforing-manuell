@@ -8,7 +8,6 @@ import no.nav.common.embeddedutils.getAvailablePort
 import no.nav.dagpenger.events.avro.Annet
 import no.nav.dagpenger.events.avro.Behov
 import no.nav.dagpenger.events.avro.Ettersending
-import no.nav.dagpenger.events.avro.HenvendelsesType
 import no.nav.dagpenger.events.avro.Journalpost
 import no.nav.dagpenger.events.avro.Mottaker
 import no.nav.dagpenger.events.avro.Søknad
@@ -67,29 +66,29 @@ class JournalføringRutingComponentTest {
 
         //Test data: (hasBehandlendeEnhet, henvendelsesType)
         val testData = listOf(
-                Pair(true, HenvendelsesType.newBuilder().setSøknad(Søknad()).build()),
-                Pair(true, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
-                Pair(true, HenvendelsesType.newBuilder().setSøknad(Søknad()).build()),
-                Pair(true, HenvendelsesType.newBuilder().setSøknad(Søknad()).build()),
-                Pair(true, HenvendelsesType.newBuilder().setSøknad(Søknad()).build()),
-                Pair(true, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
-                Pair(true, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
-                Pair(true, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
-                Pair(false, HenvendelsesType.newBuilder().setAnnet(Annet()).build()),
-                Pair(true, HenvendelsesType.newBuilder().setEttersending(Ettersending()).build())
+            Pair(true, Søknad()),
+            Pair(true, Annet()),
+            Pair(true, Søknad()),
+            Pair(true, Søknad()),
+            Pair(true, Søknad()),
+            Pair(true, Annet()),
+            Pair(true, Annet()),
+            Pair(true, Annet()),
+            Pair(false, Annet()),
+            Pair(true, Ettersending())
         )
 
-        val behovsToProcess = testData.filter { it.first && it.second.getAnnet() != null }.size
+        val behovsToProcess = testData.filter { it.first && it.second is Annet }.size
 
         // given an environment
         val env = Environment(
-                gsakOppgaveUrl = "local",
-                oicdStsUrl = "local",
-                username = username,
-                password = password,
-                bootstrapServersUrl = embeddedEnvironment.brokersURL,
-                schemaRegistryUrl = embeddedEnvironment.schemaRegistry!!.url,
-                httpPort = getAvailablePort()
+            gsakOppgaveUrl = "local",
+            oicdStsUrl = "local",
+            username = username,
+            password = password,
+            bootstrapServersUrl = embeddedEnvironment.brokersURL,
+            schemaRegistryUrl = embeddedEnvironment.schemaRegistry!!.url,
+            httpPort = getAvailablePort()
         )
 
         val dummyGsakClient = DummyGsakClient()
@@ -108,10 +107,10 @@ class JournalføringRutingComponentTest {
                 .setBehandleneEnhet(if (data.first) "behandleneEnhet" else null)
                 .setHenvendelsesType(data.second)
                 .setJournalpost(
-                        Journalpost
-                                .newBuilder()
-                                .setJournalpostId("12345")
-                                .build()
+                    Journalpost
+                        .newBuilder()
+                        .setJournalpostId("12345")
+                        .build()
                 )
                 .build()
 
@@ -130,13 +129,17 @@ class JournalføringRutingComponentTest {
     class DummyGsakClient : GsakClient {
         var oppgaverCreated = 0
 
-        override fun createManuellJournalføringsoppgave(request: ManuellJournalføringsoppgaveRequest, correlationId: String): ManuellJournalføringsoppgaveResponse {
+        override fun createManuellJournalføringsoppgave(
+            request: ManuellJournalføringsoppgaveRequest,
+            correlationId: String
+        ): ManuellJournalføringsoppgaveResponse {
             oppgaverCreated++
             return ManuellJournalføringsoppgaveResponse(
-                    versjon = 1,
-                    aktivDato = "2018-12-14",
-                    prioritet = Prioritet.NORM,
-                    status = "UNDER_BEHANDLING")
+                versjon = 1,
+                aktivDato = "2018-12-14",
+                prioritet = Prioritet.NORM,
+                status = "UNDER_BEHANDLING"
+            )
         }
     }
 
