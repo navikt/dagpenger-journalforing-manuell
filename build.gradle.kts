@@ -86,7 +86,7 @@ spotless {
 pitest {
     threads = 4
     pitestVersion = "1.4.3"
-    coverageThreshold = 10
+    coverageThreshold = 80
     avoidCallsTo = setOf("kotlin.jvm.internal")
     targetClasses = setOf("no.nav.dagpenger.*")
 }
