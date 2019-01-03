@@ -11,9 +11,9 @@ Gradle brukes som byggverktøy og er bundlet inn.
 
 Environment variables:  
 OIDC_STS_ISSUERURL=http://localhost:8080/castlemock/mock/rest/project/o9jGYV/application/3xK9Jr/stsoidc  
-JOURNALFOERINNGAAENDE_V1_URL=http://localhost:8080/castlemock/mock/rest/project/86U51B/application/IeLTvj/  
-SRVDAGPENGER_JOARK_MOTTAK_USERNAME=igroup  
-SRVDAGPENGER_JOARK_MOTTAK_PASSWORD=itest  
+OPPGAVE_OPPGAVER_URL=http://localhost:8080/castlemock/mock/rest/project/oWyKGz/application/SFdy73/  
+SRVDAGPENGER_JOURNALFORING_MANUELL_USERNAME=igroup  
+SRVDAGPENGER_JOURNALFORING_MANUELL_PASSWORD=itest  
 
 ---
 
