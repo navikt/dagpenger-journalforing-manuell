@@ -1,6 +1,6 @@
 name: dagpenger-journalforing-manuell
 image: repo.adeo.no:5443/dagpenger-journalforing-manuell
-team: dagpenger
+team: teamdagpenger
 replicas:
   min: 2
   max: 4
