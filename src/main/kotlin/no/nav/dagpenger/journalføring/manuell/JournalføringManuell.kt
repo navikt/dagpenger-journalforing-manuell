@@ -10,14 +10,15 @@ import no.nav.dagpenger.streams.Service
 import no.nav.dagpenger.streams.Topics.INNGÅENDE_JOURNALPOST
 import no.nav.dagpenger.streams.consumeTopic
 import no.nav.dagpenger.streams.streamConfig
-import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
+import org.apache.kafka.streams.Topology
 import java.time.LocalDate
 import java.util.Properties
 
 private val LOGGER = KotlinLogging.logger {}
 
 class JournalføringManuell(val env: Environment, private val gsakClient: GsakClient) : Service() {
+
     override val SERVICE_APP_ID = "journalføring-manuell" // NB: also used as group.id for the consumer group - do not change!
 
     override val HTTP_PORT: Int = env.httpPort ?: super.HTTP_PORT
@@ -32,18 +33,15 @@ class JournalføringManuell(val env: Environment, private val gsakClient: GsakCl
         }
     }
 
-    override fun setupStreams(): KafkaStreams {
-        LOGGER.info { "Initiating start of $SERVICE_APP_ID" }
-
+    override fun buildTopology(): Topology {
         val builder = StreamsBuilder()
         val inngåendeJournalposter = builder.consumeTopic(INNGÅENDE_JOURNALPOST, env.schemaRegistryUrl)
 
         inngåendeJournalposter
-                .peek { key, value -> LOGGER.info("Processing behov with id ${value.getBehovId()}") }
-                .filter { _, behov -> shouldBeProcessed(behov) }
-                .foreach { _, value -> createManuellJournalføringsoppgave(value) }
-
-        return KafkaStreams(builder.build(), this.getConfig())
+            .peek { key, value -> LOGGER.info("Processing behov with id ${value.getBehovId()}") }
+            .filter { _, behov -> shouldBeProcessed(behov) }
+            .foreach { _, value -> createManuellJournalføringsoppgave(value) }
+        return builder.build()
     }
 
     override fun getConfig(): Properties {
