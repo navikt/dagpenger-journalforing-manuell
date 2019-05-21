@@ -62,7 +62,7 @@ class JournalføringRutingComponentTest {
     @Test
     fun ` Component test of JournalføringManuell `() {
 
-        //Test data: (hasBehandlendeEnhet, henvendelsesType)
+        // Test data: (hasBehandlendeEnhet, henvendelsesType)
         val testData = listOf(
             Pair(true, Søknad()),
             Pair(true, Annet()),
@@ -92,7 +92,7 @@ class JournalføringRutingComponentTest {
         val dummyGsakClient = DummyGsakClient()
         val manuell = JournalføringManuell(env, dummyGsakClient)
 
-        //produce behov...
+        // produce behov...
 
         val behovProducer = behovProducer(env)
 
@@ -116,7 +116,7 @@ class JournalføringRutingComponentTest {
             LOGGER.info { "Produced -> ${record.topic()}  to offset ${record.offset()}" }
         }
 
-        //Wait for manuell to consume behov
+        // Wait for manuell to consume behov
         sleep(5000)
 
         manuell.stop()
